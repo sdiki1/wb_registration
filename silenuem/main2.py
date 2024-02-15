@@ -21,7 +21,6 @@ def generate_code():
 
 def reg_account():
     print('try to get proxy')
-    print('try to get proxy')
     while True:
         Session = sessionmaker()
         session = Session(bind=engine)
@@ -39,6 +38,7 @@ def reg_account():
         session.commit()
         session.close()
         break
+    print('proxy geted, wait 30sec')
     time.sleep(30)
     try:
         url = 'https://www.wildberries.ru/security/login'
@@ -68,33 +68,23 @@ def reg_account():
             print(f'CAPTCHA {hash_name} - {res}')
             input_captcha_res = browser.find_element(By.ID, 'smsCaptchaCode').send_keys(res)
             time.sleep(25)
-
+            print('captcha solved')
             code = get_code(data_number['tzid'])
             while code == -1:
                 code = get_code(data_number['tzid'])
                 print(code)
                 time.sleep(2)
             print(code)
-            # input_sms_code = browser.find_elements(By.CLASS_NAME, 'input-item')
-            # print(input_sms_code)
-            # print('\n\n\n')
-            # time.sleep(10)
-            # # print(input_sms_code)
-            # input_sms_code[0].click()
-            # print('button clicked)')
             actions = ActionChains(browser)
             res = actions.send_keys(code)
             print(res)
             actions.perform()
-            time.sleep(60)
+            time.sleep(10)
             print('code performed')
-            # browser.find_element(By.XPATH, '/html/body/div[1]/header/div/div[2]/div[2]/div[3]/a').click()
-            print('cart opened')
-            # time.sleep(5)
-            # browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div')
 
             cookies = browser.get_cookies()
-            print('try ti get cookies')
+            print(cookies)
+            print('try to get cookie wildauth')
             for i in cookies:
                 if i['name'] == 'WILDAUTHNEW_V3':
                     auth_V3 = i['value']
@@ -110,99 +100,19 @@ def reg_account():
             account = session.query(Accounts).filter(Accounts.AuthV3 == auth_V3).first()
             session.close()
             print("END OF REGISTRATION")
-            browser.close()
-            return account.Id
-    except Exception as E:
-        print(f'ERROR - {E}')
-        try:
-            Session = sessionmaker()
-            account.Is_using = False
-            account.Date_active = datetime.datetime.today()
-            session = Session(bind=engine)
-            proxy = session.query(modems).filter(modems.Id == proxy_id).first()
-            proxy.Is_using = False
-            proxy.To_reboot = True
-            session.add(account)
-            session.add(proxy)
-            session.commit()
-            session.close()
-        except Exception as E:
-            print('error with tatata', E)
-        return reg_account()
-    try:
-        Session = sessionmaker()
-        account.Is_using = False
-        account.Date_active = datetime.datetime.today()
-        session = Session(bind=engine)
-        proxy = session.query(modems).filter(modems.Id == proxy_id).first()
-        proxy.Is_using = False
-        proxy.To_reboot = True
-        session.add(account)
-        session.add(proxy)
-        session.commit()
-        session.close()
-    except Exception as E:
-        print('error with tatata', E)
-    print("end!")
-        
-
-
-
-def open_site(id_ac):
-
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    account = session.query(Accounts).filter(Accounts.Id == id_ac).first()
-    account.Is_using = True
-    session.commit()
-    account = session.query(Accounts).filter(Accounts.Id == id_ac).first()
-    session.close()
-    
-    print('try to get proxy')
-    while True:
-        Session = sessionmaker()
-        session = Session(bind=engine)
-        proxies = session.query(modems).filter(modems.Is_using.is_(False)).filter(modems.To_reboot.is_(False)).all()
-        print(proxies)
-        if proxies == []:
-            time.sleep(10)
-            continue
-        prox = proxies[random.randint(0, len(proxies)-1)]
-        print('done')
-        prox.Is_using = True
-        proxy_id = prox.Id
-        proxy_ip = prox.Ip
-        session.add(prox)
-        session.commit()
-        session.close()
-        break
-    time.sleep(20)
-    try:
-        print(proxy_ip)
-        print(proxy_id)
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument('--proxy-server=socks5://' + proxy_ip)
-        print('lol')
-        with uc.Chrome(options=chrome_options) as browser:
-            url = 'https://www.wildberries.ru'
-            browser.get(url)
-
-            print(account)
-            cookie = {'name': 'WILDAUTHNEW_V3', 'value': account.AuthV3}
-            browser.add_cookie(cookie)
-            time.sleep(3)
             browser.refresh()
             time.sleep(2)
             name = random_name()
             print(name)
             time.sleep(8)
-            browser.find_element(By.XPATH, '/html/body/div[1]/header/div/div[2]/div[2]/div[3]/a/span').click()
-            time.sleep(10)
-            browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div/a').click()
+            browser.find_element(By.XPATH, '//*[@id="basketContent"]/div[3]').click() # - button with personal accoumt menu
+            print('open profile')
+            time.sleep(8)
+            browser.find_element(By.XPATH, '//*[@id="app"]/div[2]/div/div' ).click() # open profile menu
             time.sleep(6)
-            browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div/section[1]/div/div/button').click()
+            browser.find_element(By.XPATH, '//*[@id="app"]/div[2]/div/div/section[1]/div/div/button').click() #button to edit profile
             time.sleep(1)
-            inpt = browser.find_element(By.XPATH, '/html/body/div[1]/div/form/ul/li/input')
+            inpt = browser.find_element(By.XPATH, '//*[@id="Item.FirstName"]')
             inpt.clear()
             time.sleep(0.5)
             inpt.send_keys(name['name'])
@@ -223,9 +133,9 @@ def open_site(id_ac):
             session.add(account)
             session.commit()
             session.close()
-    except:
-        return open_site(id_ac=id_ac)
-    finally:
+
+    except Exception as E:
+        print(f'ERROR - {E}')
         try:
             Session = sessionmaker()
             account.Is_using = False
@@ -240,7 +150,119 @@ def open_site(id_ac):
             session.close()
         except Exception as E:
             print('error with tatata', E)
+        return -1
+    try:
+        Session = sessionmaker()
+        account.Is_using = False
+        account.Date_active = datetime.datetime.today()
+        session = Session(bind=engine)
+        proxy = session.query(modems).filter(modems.Id == proxy_id).first()
+        proxy.Is_using = False
+        proxy.To_reboot = True
+        session.add(account)
+        session.add(proxy)
+        session.commit()
+        session.close()
+    except Exception as E:
+        print('error with tatata', E)
     print("end!")
+        
+
+
+
+# def open_site(id_ac):
+
+#     Session = sessionmaker(bind=engine)
+#     session = Session()
+#     account = session.query(Accounts).filter(Accounts.Id == id_ac).first()
+#     account.Is_using = True
+#     session.commit()
+#     account = session.query(Accounts).filter(Accounts.Id == id_ac).first()
+#     session.close()
+    
+#     print('try to get proxy')
+#     while True:
+#         Session = sessionmaker()
+#         session = Session(bind=engine)
+#         proxies = session.query(modems).filter(modems.Is_using.is_(False)).filter(modems.To_reboot.is_(False)).all()
+#         print(proxies)
+#         if proxies == []:
+#             time.sleep(10)
+#             continue
+#         prox = proxies[random.randint(0, len(proxies)-1)]
+#         print('done')
+#         prox.Is_using = True
+#         proxy_id = prox.Id
+#         proxy_ip = prox.Ip
+#         session.add(prox)
+#         session.commit()
+#         session.close()
+#         break
+#     time.sleep(20)
+#     try:
+#         print(proxy_ip)
+#         print(proxy_id)
+#         chrome_options = webdriver.ChromeOptions()
+#         chrome_options.add_argument('--proxy-server=socks5://' + proxy_ip)
+#         print('lol')
+#         with uc.Chrome(options=chrome_options) as browser:
+#             url = 'https://www.wildberries.ru'
+#             browser.get(url)
+
+#             print(account)
+#             cookie = {'name': 'WILDAUTHNEW_V3', 'value': account.AuthV3}
+#             browser.add_cookie(cookie)
+#             time.sleep(3)
+#             browser.refresh()
+#             time.sleep(2)
+#             name = random_name()
+#             print(name)
+#             time.sleep(8)
+#             browser.find_element(By.XPATH, '/html/body/div[1]/header/div/div[2]/div[2]/div[3]/a/span').click()
+#             time.sleep(10)
+#             browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div/a').click()
+#             time.sleep(6)
+#             browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div/section[1]/div/div/button').click()
+#             time.sleep(1)
+#             inpt = browser.find_element(By.XPATH, '/html/body/div[1]/div/form/ul/li/input')
+#             inpt.clear()
+#             time.sleep(0.5)
+#             inpt.send_keys(name['name'])
+#             time.sleep(2)
+#             browser.find_element(By.XPATH, '/html/body/div[1]/div/form/div[1]/button').click()
+#             time.sleep(3)
+#             if name['is_man']:
+#                 browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div/section[1]/ul/li[2]/div/label[1]/span[1]').click()
+#             else:
+#                 browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div/section[1]/ul/li[2]/div/label[2]/span[1]').click()
+            
+
+#             account.Is_man = name['is_man']
+#             account.Name = name['name']
+#             account.Is_using = False
+#             Session = sessionmaker(bind=engine)
+#             session = Session()
+#             session.add(account)
+#             session.commit()
+#             session.close()
+#     except:
+#         return open_site(id_ac=id_ac)
+#     finally:
+#         try:
+#             Session = sessionmaker()
+#             account.Is_using = False
+#             account.Date_active = datetime.datetime.today()
+#             session = Session(bind=engine)
+#             proxy = session.query(modems).filter(modems.Id == proxy_id).first()
+#             proxy.Is_using = False
+#             proxy.To_reboot = True
+#             session.add(account)
+#             session.add(proxy)
+#             session.commit()
+#             session.close()
+#         except Exception as E:
+#             print('error with tatata', E)
+#     print("end!")
         
 
 

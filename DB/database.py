@@ -2,8 +2,8 @@ from sqlalchemy import create_engine, Column, Integer, String, MetaData, DateTim
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-user = 'auth_user'
-password = 'wtmybhn17vqphgc'
+user = 'wb_reg'
+password = 'mrQ9JnHEsBe8kCGtVpuPUA'
 host = '92.63.179.55'
 db_name = 'goldgym'
 DATABASE_URL = f"postgresql://{user}:{password}@{host}/{db_name}"
@@ -28,6 +28,15 @@ class Accounts(Base):
     AuthV3 = Column(String)
     Date_active = Column(DateTime)
     Is_using = Column(Boolean)
+
+class modems(Base):
+    __tablename__ = "modems"
+
+    Id = Column(Integer, primary_key=True)
+    Ip = Column(String)
+    Is_using = Column(Boolean)
+    To_reboot = Column(Boolean)
+    
 
 Base.metadata.create_all(engine)
 
