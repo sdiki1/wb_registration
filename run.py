@@ -11,5 +11,5 @@ def run_all():
     for i in range(30):
         th(target=reg_account).start()
         time.sleep(120)
-    
-run_all()
+reg_account()
+# run_all()

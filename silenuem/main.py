@@ -92,7 +92,9 @@ def reg_account():
             print('cart opened')
             # time.sleep(5)
             # browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div')
-
+            
+            time.sleep(45)
+            
             cookies = browser.get_cookies()
             print('try ti get cookies')
             for i in cookies:

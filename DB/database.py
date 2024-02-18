@@ -2,10 +2,10 @@ from sqlalchemy import create_engine, Column, Integer, String, MetaData, DateTim
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-user = 'wb_reg'
-password = 'mrQ9JnHEsBe8kCGtVpuPUA'
-host = '92.63.179.55'
-db_name = 'goldgym'
+user = "root"
+password = "vukSTxKmPMF"
+host = "213.226.127.94"
+db_name = "buys_mp"
 DATABASE_URL = f"postgresql://{user}:{password}@{host}/{db_name}"
 
 engine = create_engine(DATABASE_URL) 

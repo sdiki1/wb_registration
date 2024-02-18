@@ -54,9 +54,9 @@ def reg_account():
             browser.find_element(By.CLASS_NAME, 'input-item').send_keys(data_number['number'][2::])
             time.sleep(5)
             browser.find_element(By.ID, "requestCode").click()
-            time.sleep(5)
+            time.sleep(15)
 
-            cpt_el = browser.find_element(By.CLASS_NAME, 'form-block__captcha-img')
+            cpt_el = browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div/form/div/div[3]/div/img')
             time.sleep(5)
             hash_name = generate_code()
             cpt_el.screenshot(f'captcha.png')
@@ -81,24 +81,8 @@ def reg_account():
             actions.perform()
             time.sleep(10)
             print('code performed')
-
-            cookies = browser.get_cookies()
-            print(cookies)
-            print('try to get cookie wildauth')
-            for i in cookies:
-                if i['name'] == 'WILDAUTHNEW_V3':
-                    auth_V3 = i['value']
-            new_account = Accounts(
-                AuthV3 = auth_V3,
-                Date_active = datetime.datetime.now(),
-                Is_using = False
-            )
-            Session = sessionmaker(bind=engine)
-            session = Session()
-            session.add(new_account)
-            session.commit()
-            account = session.query(Accounts).filter(Accounts.AuthV3 == auth_V3).first()
-            session.close()
+            time.sleep(25)
+            
             print("END OF REGISTRATION")
             browser.refresh()
             time.sleep(2)
@@ -120,20 +104,41 @@ def reg_account():
             browser.find_element(By.XPATH, '/html/body/div[1]/div/form/div[1]/button').click()
             time.sleep(3)
             if name['is_man']:
-                browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div/section[1]/ul/li[2]/div/label[1]/span[1]').click()
+                browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div/section[1]/ul/li[3]/div/label[1]/span[1]').click()
             else:
-                browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div/section[1]/ul/li[2]/div/label[2]/span[1]').click()
-            
-
-            account.Is_man = name['is_man']
-            account.Name = name['name']
-            account.Is_using = False
-            Session = sessionmaker(bind=engine)
-            session = Session()
-            session.add(account)
-            session.commit()
-            session.close()
-
+                browser.find_element(By.XPATH, '/html/body/div[1]/main/div[2]/div/div[2]/div/div/section[1]/ul/li[3]/div/label[2]/span[3]').click()
+            print("DONNE")
+            time.sleep(15)
+            browser.refresh()
+            time.sleep(10)
+            cookies = browser.get_cookies()
+            print(cookies)
+            print('try to get cookie wildauth')
+            try:
+                for i in cookies:
+                    if i['name'] == 'WILDAUTHNEW_V3':
+                        auth_V3 = i['value']
+                new_account = Accounts(
+                    AuthV3 = auth_V3,
+                    Date_active = datetime.datetime.now(),
+                    Is_using = False
+                )
+                Session = sessionmaker(bind=engine)
+                session = Session()
+                session.add(new_account)
+                session.commit()
+                account = session.query(Accounts).filter(Accounts.AuthV3 == auth_V3).first()
+                session.close()
+                account.Is_man = name['is_man']
+                account.Name = name['name']
+                account.Is_using = False
+                Session = sessionmaker(bind=engine)
+                session = Session()
+                session.add(account)
+                session.commit()
+                session.close()
+            except Exception as E:
+                print("Error with adding data to db")
     except Exception as E:
         print(f'ERROR - {E}')
         try:
